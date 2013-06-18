@@ -256,7 +256,7 @@ const CGFloat kPresentPopoverSheetDuration = .25;
 
 - (void) presentWithShrinkForWindow:(UIWindow*)window
 {
-    CGFloat startScale = 1.5;
+    CGFloat startScale = 1.25;
     CATransform3D startTransform = CATransform3DMakeScale(startScale, startScale, 1.0);
     CATransform3D endTransform = CATransform3DIdentity;
     
@@ -277,7 +277,7 @@ const CGFloat kPresentPopoverSheetDuration = .25;
 
 - (void) dismissWithShink
 {
-    CGFloat endScale = 0.5;
+    CGFloat endScale = 0.75;
     CATransform3D startTransform = CATransform3DIdentity;
     CATransform3D endTransform = CATransform3DMakeScale(endScale, endScale, 1.0);;
     
