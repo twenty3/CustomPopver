@@ -16,6 +16,7 @@
 
 - (IBAction)customShowItTapped:(id)sender;
 - (IBAction)showItTapped:(id)sender;
+- (IBAction)alertViewButtonTapped:(id)sender;
 
 @end
 
@@ -44,6 +45,13 @@
     {
         [actionSheet showFromRect:(CGRect){10,10, 100, 100} inView:sender animated:YES];
     }
+}
+
+- (IBAction)alertViewButtonTapped:(id)sender
+{
+    UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:@"Sample Alert View" message:@"Fear is the mind-killer" delegate:self cancelButtonTitle:@"Must not fear" otherButtonTitles:nil];
+    
+    [alertView show];
 }
 
 @end

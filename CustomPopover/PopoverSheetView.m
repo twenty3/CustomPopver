@@ -13,7 +13,8 @@ const CGFloat kPopoverSheetHeight = 400.0;
 const CGFloat kPopoverSheetWidth = 280.0;
 const CGFloat kPopoverSheetBottomMargin = 60.0;
 
-const CGFloat kPresentPopoverSheetDuration = .35;
+const CGFloat kPresentPopoverSheetDuration = .25;
+
 
 @interface PopoverSheetView ()
 
@@ -77,8 +78,8 @@ const CGFloat kPresentPopoverSheetDuration = .35;
     self.layer.cornerRadius = 10.0;
     self.layer.masksToBounds = NO;
     self.layer.shadowColor = [UIColor blackColor].CGColor;
-    self.layer.shadowRadius = 5.0;
-    self.layer.shadowOffset = (CGSize){0.0, 4.0};
+    self.layer.shadowRadius = 1.0;
+    self.layer.shadowOffset = (CGSize){0.0, 1.0};
     self.layer.shadowOpacity = 0.5;
     self.frame = (CGRect){0.0, 0.0, kPopoverSheetWidth, kPopoverSheetHeight};
     
@@ -195,37 +196,148 @@ const CGFloat kPresentPopoverSheetDuration = .35;
 
 #pragma mark - Presentation
 
-- (void) showFromView:(UIView*)view animated:(BOOL)animated
-{
-    UIWindow* window = [view window];
-    
-    [self presentShieldOnWindow:window animated:animated];
-    
-    [self layoutForWindow:window];
-    [window insertSubview:self atIndex:window.subviews.count];
-    
-    CGRect startFrame = self.frame;
-    startFrame.origin.y = CGRectGetMaxY(window.frame);
-    CGRect endFrame = self.frame;
-    
-    CGFloat startOpacity = self.layer.opacity * 0.8;
-    CGFloat endOpacity = self.layer.opacity;
-    
-    self.frame = startFrame;
-    self.layer.opacity = startOpacity;
-    
-    [UIView animateWithDuration:kPresentPopoverSheetDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.frame = endFrame;
-        self.layer.opacity = endOpacity;
-    } completion:^(BOOL finished) {
-        // Do something
-    }];
-}
+ - (void) showFromView:(UIView*)view animated:(BOOL)animated
+ {
+     UIWindow* window = [view window];
+     
+     [self presentShieldOnWindow:window animated:animated];
+     
+     [self layoutForWindow:window];
+     [window insertSubview:self atIndex:window.subviews.count];
+     
+     if (animated)
+     {
+         //[self presentWithAnimatedFadeInForWindow:window];
+         //[self presentWithAnimatedSlideInForWindow:window];
+         //[self presentWithGrowForWindow:window];
+         [self presentWithShrinkForWindow:window];
+     }
+ }
+ 
 
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated
 {
     [self dismissShieldAnimated:animated];
 
+    if ( animated )
+    {
+        //[self dismissWithAnimatedFadeOut];
+        //[self dismissWithAnimatedSlideOut];
+        [self dismissWithShink];
+    }
+    else
+    {
+        [self removeFromSuperview];
+    }
+}
+
+#pragma mark - Scale
+
+- (void) presentWithGrowForWindow:(UIWindow*)window
+{
+    CGFloat startScale = 0.1;
+    CATransform3D startTransform = CATransform3DMakeScale(startScale, startScale, 1.0);
+    CATransform3D endTransform = CATransform3DIdentity;
+    
+    CGFloat startOpacity = 0.0;
+    CGFloat endOpacity = 1.0;
+    
+    self.layer.transform = startTransform;
+    self.layer.opacity = startOpacity;
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.layer.transform = endTransform;
+                         self.layer.opacity = endOpacity;
+                     } completion:nil];
+}
+
+- (void) presentWithShrinkForWindow:(UIWindow*)window
+{
+    CGFloat startScale = 1.5;
+    CATransform3D startTransform = CATransform3DMakeScale(startScale, startScale, 1.0);
+    CATransform3D endTransform = CATransform3DIdentity;
+    
+    CGFloat startOpacity = 0.0;
+    CGFloat endOpacity = 1.0;
+    
+    self.layer.transform = startTransform;
+    self.layer.opacity = startOpacity;
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.layer.transform = endTransform;
+                         self.layer.opacity = endOpacity;
+                     } completion:nil];
+}
+
+- (void) dismissWithShink
+{
+    CGFloat endScale = 0.5;
+    CATransform3D startTransform = CATransform3DIdentity;
+    CATransform3D endTransform = CATransform3DMakeScale(endScale, endScale, 1.0);;
+    
+    CGFloat startOpacity = 1.0;
+    CGFloat endOpacity = 0.0;
+    
+    self.layer.transform = startTransform;
+    self.layer.opacity = startOpacity;
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.layer.transform = endTransform;
+                         self.layer.opacity = endOpacity;
+                     } completion:^(BOOL finished){
+                         [self removeFromSuperview];
+                     }];
+}
+
+#pragma mark - Fade
+
+- (void) presentWithAnimatedFadeInForWindow:(UIWindow*)window
+{
+    CGFloat startOpacity = 0.0;
+    CGFloat endOpacity = self.layer.opacity;
+    
+    self.layer.opacity = startOpacity;
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.layer.opacity = endOpacity;
+                     }
+                     completion:nil];
+}
+
+- (void) dismissWithAnimatedFadeOut
+{
+    CGFloat startOpacity = self.layer.opacity;
+    CGFloat endOpacity = 0.0;
+    
+    self.layer.opacity = startOpacity;
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:^{
+                         self.layer.opacity = endOpacity;
+                     }
+                     completion:^(BOOL finished){
+                         [self removeFromSuperview];
+                     }];
+}
+
+#pragma mark - Slide
+
+- (void) dismissWithAnimatedSlideOut
+{
     CGRect startFrame = self.frame;
     CGRect endFrame = self.frame;
     endFrame.origin.y = CGRectGetMaxY(self.window.frame);
@@ -236,13 +348,45 @@ const CGFloat kPresentPopoverSheetDuration = .35;
     self.frame = startFrame;
     self.layer.opacity = startOpacity;
     
-    [UIView animateWithDuration:kPresentPopoverSheetDuration delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    void (^animations)(void) = ^{
         self.frame = endFrame;
         self.layer.opacity = endOpacity;
-    } completion:^(BOOL finished) {
-        [self removeFromSuperview];
-    }];
+    };
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:animations
+                     completion:^(BOOL finished){
+                         [self removeFromSuperview];
+                     }];
 }
+
+- (void) presentWithAnimatedSlideInForWindow:(UIWindow*)window
+{
+    CGRect startFrame = self.frame;
+    startFrame.origin.y = CGRectGetMaxY(window.frame);
+    CGRect endFrame = self.frame;
+    
+    CGFloat startOpacity = self.layer.opacity * 0.8;
+    CGFloat endOpacity = self.layer.opacity;
+    
+    self.frame = startFrame;
+    self.layer.opacity = startOpacity;
+    
+    void (^animations)(void) = ^{
+        self.frame = endFrame;
+        self.layer.opacity = endOpacity;
+    };
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseInOut
+                     animations:animations
+                     completion:nil];
+}
+
+#pragma mark - Shield
 
 - (void) presentShieldOnWindow:(UIWindow*)window animated:(BOOL)animated
 {
@@ -254,11 +398,13 @@ const CGFloat kPresentPopoverSheetDuration = .35;
     
     [window insertSubview:self.shieldingView atIndex:window.subviews.count];
     
-    [UIView animateWithDuration:kPresentPopoverSheetDuration delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-        self.shieldingView.layer.opacity = endOpacity;
-    } completion:^(BOOL finished) {
-        // do something
-    }];
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         self.shieldingView.layer.opacity = endOpacity;
+                     }
+                     completion:nil];
 }
 
 - (void) dismissShieldAnimated:(BOOL)animated
@@ -268,11 +414,15 @@ const CGFloat kPresentPopoverSheetDuration = .35;
     
     self.shieldingView.layer.opacity = startOpacity;
     
-    [UIView animateWithDuration:kPresentPopoverSheetDuration delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-        self.shieldingView.layer.opacity = endOpacity;
-    } completion:^(BOOL finished) {
-        [self.shieldingView removeFromSuperview];
-    }];
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         self.shieldingView.layer.opacity = endOpacity;
+                     }
+                     completion:^(BOOL finished) {
+                         [self.shieldingView removeFromSuperview];
+                     }];
 }
 
 

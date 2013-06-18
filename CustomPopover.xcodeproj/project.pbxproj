@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		014E887D1770072F00C7089A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 014E887C1770072F00C7089A /* QuartzCore.framework */; };
 		0174EB86176D3A12005F7B99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0174EB85176D3A12005F7B99 /* UIKit.framework */; };
 		0174EB88176D3A12005F7B99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0174EB87176D3A12005F7B99 /* Foundation.framework */; };
 		0174EB8A176D3A12005F7B99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0174EB89176D3A12005F7B99 /* CoreGraphics.framework */; };
@@ -22,6 +23,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		014E887C1770072F00C7089A /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		0174EB82176D3A12005F7B99 /* CustomPopover.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CustomPopover.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0174EB85176D3A12005F7B99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		0174EB87176D3A12005F7B99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -47,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				014E887D1770072F00C7089A /* QuartzCore.framework in Frameworks */,
 				0174EB86176D3A12005F7B99 /* UIKit.framework in Frameworks */,
 				0174EB88176D3A12005F7B99 /* Foundation.framework in Frameworks */,
 				0174EB8A176D3A12005F7B99 /* CoreGraphics.framework in Frameworks */,
@@ -59,6 +62,7 @@
 		0174EB79176D3A12005F7B99 = {
 			isa = PBXGroup;
 			children = (
+				014E887C1770072F00C7089A /* QuartzCore.framework */,
 				0174EB8B176D3A12005F7B99 /* CustomPopover */,
 				0174EB84176D3A12005F7B99 /* Frameworks */,
 				0174EB83176D3A12005F7B99 /* Products */,
