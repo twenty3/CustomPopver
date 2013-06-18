@@ -11,7 +11,9 @@
 
 const CGFloat kPopoverSheetHeight = 400.0;
 const CGFloat kPopoverSheetWidth = 280.0;
-const CGFloat kPopoverSheetBottomMargin = 60.0;
+
+const CGFloat kShieldOpactiy = 0.5;
+const CGFloat kShieldIntensity = 0.0;
 
 const CGFloat kPresentPopoverSheetDuration = .25;
 
@@ -26,6 +28,7 @@ const CGFloat kPresentPopoverSheetDuration = .25;
 
 @property (nonatomic, strong) UIView* shieldingView;
 @property (nonatomic, strong) UITapGestureRecognizer* shieldTapRecognizer;
+@property (nonatomic, strong) UIWindow* shieldWindow;
 
 @property (nonatomic, assign) BOOL initialized;
 
@@ -112,12 +115,18 @@ const CGFloat kPresentPopoverSheetDuration = .25;
     [self.button2 addTarget:self action:@selector(button2Tapped:) forControlEvents:UIControlEventTouchUpInside];
     
     self.shieldingView = [UIView new];
-    self.shieldingView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
+    self.shieldingView.backgroundColor = [UIColor colorWithWhite:kShieldIntensity alpha:kShieldOpactiy];
     
     self.shieldTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(shieldViewTapped)];
     self.shieldTapRecognizer.numberOfTapsRequired = 1;
     self.shieldTapRecognizer.numberOfTouchesRequired = 1;
     [self.shieldingView addGestureRecognizer:self.shieldTapRecognizer];
+    
+    self.shieldWindow = [[UIWindow alloc] initWithFrame:CGRectZero];
+    self.shieldWindow.windowLevel = UIWindowLevelStatusBar + 1.0f;
+    self.shieldWindow.clipsToBounds = YES;
+    self.shieldWindow.backgroundColor = [UIColor colorWithWhite:kShieldIntensity alpha:kShieldOpactiy];
+    self.shieldWindow.hidden = YES;
     
     self.initialized = YES;
 }
@@ -199,23 +208,26 @@ const CGFloat kPresentPopoverSheetDuration = .25;
  {
      UIWindow* window = [view window];
      
+     [self presentStatusBarSheildForWindow:window animated:YES];
      [self presentShieldOnWindow:window animated:animated];
      
-     [self layoutCenteredInRect:view.frame];
+     CGRect presentationRect = [window convertRect:view.frame fromView:view];
+     [self layoutCenteredInRect:presentationRect];
      [window insertSubview:self atIndex:window.subviews.count];
      
      if (animated)
      {
-         //[self presentWithAnimatedFadeInForWindow:window];
-         //[self presentWithAnimatedSlideInForWindow:window];
+         //[self presentWithAnimatedFadeIn];
+         //[self presentWithAnimatedSlideIn];
          //[self presentWithGrowForWindow:window];
-         [self presentWithShrinkForWindow:window];
+         [self presentWithShrink];
      }
  }
  
 
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated
 {
+    [self dismissStatusBarShieldAnimated:animated];
     [self dismissShieldAnimated:animated];
 
     if ( animated )
@@ -232,7 +244,7 @@ const CGFloat kPresentPopoverSheetDuration = .25;
 
 #pragma mark - Scale
 
-- (void) presentWithGrowForWindow:(UIWindow*)window
+- (void) presentWithGrow
 {
     CGFloat startScale = 0.1;
     CATransform3D startTransform = CATransform3DMakeScale(startScale, startScale, 1.0);
@@ -253,7 +265,7 @@ const CGFloat kPresentPopoverSheetDuration = .25;
                      } completion:nil];
 }
 
-- (void) presentWithShrinkForWindow:(UIWindow*)window
+- (void) presentWithShrink
 {
     CGFloat startScale = 1.25;
     CATransform3D startTransform = CATransform3DMakeScale(startScale, startScale, 1.0);
@@ -299,7 +311,7 @@ const CGFloat kPresentPopoverSheetDuration = .25;
 
 #pragma mark - Fade
 
-- (void) presentWithAnimatedFadeInForWindow:(UIWindow*)window
+- (void) presentWithAnimatedFadeIn
 {
     CGFloat startOpacity = 0.0;
     CGFloat endOpacity = self.layer.opacity;
@@ -361,10 +373,10 @@ const CGFloat kPresentPopoverSheetDuration = .25;
                      }];
 }
 
-- (void) presentWithAnimatedSlideInForWindow:(UIWindow*)window
+- (void) presentWithAnimatedSlideIn
 {
     CGRect startFrame = self.frame;
-    startFrame.origin.y = CGRectGetMaxY(window.frame);
+    startFrame.origin.y = CGRectGetMaxY(self.superview.frame);
     CGRect endFrame = self.frame;
     
     CGFloat startOpacity = self.layer.opacity * 0.8;
@@ -386,6 +398,54 @@ const CGFloat kPresentPopoverSheetDuration = .25;
 }
 
 #pragma mark - Shield
+
+- (void) presentStatusBarSheildForWindow:(UIWindow*)window animated:(BOOL)animated
+{
+    CGRect statusBarFrame = [UIApplication sharedApplication].statusBarFrame;
+    if ( CGRectEqualToRect(statusBarFrame, CGRectZero) ) return;
+    
+    const CGFloat startOpacity = 0.0;
+    const CGFloat endOpacity = 1.0;
+
+    self.shieldWindow.frame = statusBarFrame;
+    self.shieldWindow.hidden = NO;
+
+    if ( !animated ) return;
+    
+    self.shieldWindow.layer.opacity = startOpacity;
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         self.shieldWindow.layer.opacity = endOpacity;
+                     }
+                     completion:nil];
+}
+
+- (void) dismissStatusBarShieldAnimated:(BOOL)animated
+{
+    if ( !animated )
+    {
+        self.shieldWindow.hidden = YES;
+        return;
+    }
+    
+    const CGFloat startOpacity = 1.0;
+    const CGFloat endOpacity = 0.0;
+    
+    self.shieldWindow.layer.opacity = startOpacity;
+    
+    [UIView animateWithDuration:kPresentPopoverSheetDuration
+                          delay:0.0
+                        options:UIViewAnimationOptionCurveEaseOut
+                     animations:^{
+                         self.shieldWindow.layer.opacity = endOpacity;
+                     }
+                     completion:^(BOOL finished){
+                         self.shieldWindow.hidden = YES;
+                     }];
+}
 
 - (void) presentShieldOnWindow:(UIWindow*)window animated:(BOOL)animated
 {
