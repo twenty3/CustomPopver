@@ -182,13 +182,12 @@ const CGFloat kPresentPopoverSheetDuration = .25;
     self.shieldingView.frame = window.bounds;
 }
 
-- (void)layoutForWindow:(UIWindow*)window
+- (void) layoutCenteredInRect:(CGRect)rect;
 {
-    CGRect windowBounds = window.bounds;
     CGSize popoverSize = (CGSize){.width = kPopoverSheetWidth, .height = kPopoverSheetHeight};
     
-    CGFloat x = floor(windowBounds.size.width - popoverSize.width) / 2.0;
-    CGFloat y = CGRectGetMaxY(windowBounds) - popoverSize.height - kPopoverSheetBottomMargin;
+    CGFloat x = floor( (rect.size.width - popoverSize.width) / 2.0);
+    CGFloat y = floor( (CGRectGetMaxY(rect) - popoverSize.height) / 2.0);
     CGRect popoverFrame = (CGRect){ .origin = {x, y}, .size = popoverSize };
     
     self.frame = popoverFrame;
@@ -202,7 +201,7 @@ const CGFloat kPresentPopoverSheetDuration = .25;
      
      [self presentShieldOnWindow:window animated:animated];
      
-     [self layoutForWindow:window];
+     [self layoutCenteredInRect:view.frame];
      [window insertSubview:self atIndex:window.subviews.count];
      
      if (animated)
